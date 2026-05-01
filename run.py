@@ -53,6 +53,9 @@ def main():
     
     window = config['window']
     data['rolling_mean'] = data['close'].rolling(window=window, min_periods=window).mean()
+    
+    valid_rows = data['rolling_mean'].notna()
+    data.loc[valid_rows, 'signal'] = (data.loc[valid_rows, 'close'] > data.loc[valid_rows, 'rolling_mean']).astype(int)
 
 if __name__ == "__main__":
     main()
