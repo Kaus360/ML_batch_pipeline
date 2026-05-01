@@ -50,6 +50,9 @@ def main():
     
     config = load_config(args.config)
     data = load_data(args.input)
+    
+    window = config['window']
+    data['rolling_mean'] = data['close'].rolling(window=window, min_periods=window).mean()
 
 if __name__ == "__main__":
     main()
