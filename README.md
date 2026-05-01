@@ -1,52 +1,89 @@
 # ML Batch Pipeline
 
-A batch processing pipeline for machine learning signals.
+A minimal MLOps-style batch processing pipeline that computes a rolling mean signal on OHLCV market data. Built for reproducibility, observability, and deployment readiness.
 
-## Prerequisites
+## Overview
 
-- python 3.9+
-- docker (optional, for containerized run)
-- dependencies in `requirements.txt`
+- Loads configuration from YAML (seed, window, version)
+- Reads a 10,000-row OHLCV dataset
+- Computes a rolling mean on the close price
+- Generates a binary signal based on close vs rolling mean
+- Outputs structured metrics as JSON
+- Logs all processing steps to a log file
+- Fully Dockerized for one-command execution
 
-## Local Run
+## Project Structure
+ML_batch_pipeline/
+├── run.py            # main pipeline script
+├── config.yaml       # pipeline configuration
+├── data.csv          # 10,000-row OHLCV dataset
+├── requirements.txt  # python dependencies
+├── Dockerfile        # container definition
+├── metrics.json      # sample output from successful run
+├── run.log           # sample log from successful run
+└── README.md
 
-To run the pipeline locally, use the following command:
+## Requirements
+
+- Python 3.9+
+- Docker (for containerized run)
+
+## Local Setup
 
 ```bash
 pip install -r requirements.txt
+
 python run.py --input data.csv --config config.yaml --output metrics.json --log-file run.log
 ```
 
-## Docker Build
-
-To build the docker image:
+## Docker Setup
 
 ```bash
-docker build -t ml-batch-pipeline .
+docker build -t mlops-task .
+
+docker run --rm mlops-task
 ```
 
-## Docker Run
+## Configuration
 
-To run the pipeline using docker and output the metrics to stdout:
+Edit `config.yaml` to adjust pipeline behavior:
 
-```bash
-docker run --rm ml-batch-pipeline
+```yaml
+seed: 42
+window: 5
+version: "v1"
 ```
 
-## Example Output
+- `seed` — random seed for reproducibility
+- `window` — rolling mean window size
+- `version` — pipeline version tag included in output
 
-The pipeline outputs a `metrics.json` file. Example:
+## Output
+
+On success, `metrics.json` contains:
 
 ```json
 {
   "version": "v1",
-  "status": "success",
   "rows_processed": 10000,
-  "signal_rate": 0.4925,
-  "latency_ms": 125.43
+  "metric": "signal_rate",
+  "value": 0.4881952781112445,
+  "latency_ms": 19,
+  "seed": 42,
+  "status": "success"
+}
+```
+
+On failure:
+
+```json
+{
+  "version": "v1",
+  "status": "error",
+  "error_message": "description of what went wrong"
 }
 ```
 
 ## Reproducibility
 
-The pipeline ensures deterministic output by accepting a `seed` parameter in the `config.yaml` file. Running the same input data with the same configuration will yield identical metrics on every run.
+All runs with the same `config.yaml` and `data.csv` produce identical outputs. Seed is set via `numpy.random.seed` at startup and is recorded in the metrics output.
