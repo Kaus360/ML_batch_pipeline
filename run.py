@@ -98,10 +98,12 @@ def main():
         
         metrics = {
             "version": version,
-            "status": "success",
             "rows_processed": rows_processed,
-            "signal_rate": signal_rate,
-            "latency_ms": latency_ms
+            "metric": "signal_rate",
+            "value": signal_rate,
+            "latency_ms": int(latency_ms),
+            "seed": config["seed"],
+            "status": "success"
         }
         write_output(args.output, metrics)
         logger.info(f"metrics summary: {metrics}")

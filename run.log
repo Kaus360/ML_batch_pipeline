@@ -5,3 +5,17 @@
 2026-05-01 12:00:00,055 - batch_pipeline - INFO - computing signals
 2026-05-01 12:00:00,125 - batch_pipeline - INFO - metrics summary: {'version': 'v1', 'status': 'success', 'rows_processed': 10000, 'signal_rate': 0.4925, 'latency_ms': 125.43}
 2026-05-01 12:00:00,126 - batch_pipeline - INFO - job completed successfully
+2026-05-01 12:20:03,142 - batch_pipeline - INFO - job started
+2026-05-01 12:20:03,144 - batch_pipeline - INFO - loaded config: {'seed': 42, 'window': 5, 'version': 'v1'}
+2026-05-01 12:20:03,201 - batch_pipeline - INFO - loaded 10000 rows from data.csv
+2026-05-01 12:20:03,201 - batch_pipeline - INFO - computing rolling mean
+2026-05-01 12:20:03,204 - batch_pipeline - INFO - computing signals
+2026-05-01 12:20:03,212 - batch_pipeline - INFO - metrics summary: {'version': 'v1', 'status': 'success', 'rows_processed': 10000, 'signal_rate': 0.4881952781112445, 'latency_ms': 68.12834739685059}
+2026-05-01 12:20:03,213 - batch_pipeline - INFO - job completed successfully
+2026-05-01 12:23:32,671 - batch_pipeline - INFO - job started
+2026-05-01 12:23:32,674 - batch_pipeline - INFO - loaded config: {'seed': 42, 'window': 5, 'version': 'v1'}
+2026-05-01 12:23:32,721 - batch_pipeline - INFO - loaded 10000 rows from data.csv
+2026-05-01 12:23:32,722 - batch_pipeline - INFO - computing rolling mean
+2026-05-01 12:23:32,732 - batch_pipeline - INFO - computing signals
+2026-05-01 12:23:32,750 - batch_pipeline - INFO - metrics summary: {'version': 'v1', 'rows_processed': 10000, 'metric': 'signal_rate', 'value': 0.4881952781112445, 'latency_ms': 74, 'seed': 42, 'status': 'success'}
+2026-05-01 12:23:32,750 - batch_pipeline - INFO - job completed successfully
