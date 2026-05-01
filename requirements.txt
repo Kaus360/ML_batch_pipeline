@@ -1,1 +1,3 @@
-# empty file
+pandas==2.1.4
+numpy==1.26.4
+PyYAML==6.0.1
