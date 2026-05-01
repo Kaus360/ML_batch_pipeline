@@ -5,6 +5,20 @@ import os
 import pandas as pd
 import time
 import json
+import logging
+
+def setup_logger(log_file):
+    logger = logging.getLogger('batch_pipeline')
+    logger.setLevel(logging.INFO)
+    
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    
+    fh = logging.FileHandler(log_file)
+    fh.setLevel(logging.INFO)
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+    
+    return logger
 
 def load_config(config_path):
     if not os.path.exists(config_path):
@@ -52,8 +66,12 @@ def main():
     parser.add_argument("--config", required=True, help="path to config yaml file")
     parser.add_argument("--input", required=True, help="path to input csv file")
     parser.add_argument("--output", required=True, help="path to output metrics json file")
+    parser.add_argument("--log-file", required=True, help="path to output log file")
     
     args = parser.parse_args()
+    
+    logger = setup_logger(args.log_file)
+    logger.info("job started")
     
     start_time = time.time()
     version = "unknown"
@@ -61,12 +79,16 @@ def main():
     try:
         config = load_config(args.config)
         version = config.get('version', 'unknown')
+        logger.info(f"loaded config: {config}")
         
         data = load_data(args.input)
+        logger.info(f"loaded {len(data)} rows from {args.input}")
         
         window = config['window']
+        logger.info("computing rolling mean")
         data['rolling_mean'] = data['close'].rolling(window=window, min_periods=window).mean()
         
+        logger.info("computing signals")
         valid_rows = data['rolling_mean'].notna()
         data.loc[valid_rows, 'signal'] = (data.loc[valid_rows, 'close'] > data.loc[valid_rows, 'rolling_mean']).astype(int)
         
@@ -82,8 +104,11 @@ def main():
             "latency_ms": latency_ms
         }
         write_output(args.output, metrics)
+        logger.info(f"metrics summary: {metrics}")
+        logger.info("job completed successfully")
         
     except Exception as e:
+        logger.error(f"job failed with exception: {str(e)}", exc_info=True)
         error_metrics = {
             "version": version,
             "status": "error",
