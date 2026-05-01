@@ -3,6 +3,8 @@ import yaml
 import sys
 import os
 import pandas as pd
+import time
+import json
 
 def load_config(config_path):
     if not os.path.exists(config_path):
@@ -41,21 +43,54 @@ def load_data(input_path):
         
     return df
 
+def write_output(output_path, payload):
+    with open(output_path, 'w') as f:
+        json.dump(payload, f, indent=2)
+
 def main():
     parser = argparse.ArgumentParser(description="batch pipeline")
     parser.add_argument("--config", required=True, help="path to config yaml file")
     parser.add_argument("--input", required=True, help="path to input csv file")
+    parser.add_argument("--output", required=True, help="path to output metrics json file")
     
     args = parser.parse_args()
     
-    config = load_config(args.config)
-    data = load_data(args.input)
+    start_time = time.time()
+    version = "unknown"
     
-    window = config['window']
-    data['rolling_mean'] = data['close'].rolling(window=window, min_periods=window).mean()
-    
-    valid_rows = data['rolling_mean'].notna()
-    data.loc[valid_rows, 'signal'] = (data.loc[valid_rows, 'close'] > data.loc[valid_rows, 'rolling_mean']).astype(int)
+    try:
+        config = load_config(args.config)
+        version = config.get('version', 'unknown')
+        
+        data = load_data(args.input)
+        
+        window = config['window']
+        data['rolling_mean'] = data['close'].rolling(window=window, min_periods=window).mean()
+        
+        valid_rows = data['rolling_mean'].notna()
+        data.loc[valid_rows, 'signal'] = (data.loc[valid_rows, 'close'] > data.loc[valid_rows, 'rolling_mean']).astype(int)
+        
+        latency_ms = (time.time() - start_time) * 1000
+        rows_processed = len(data)
+        signal_rate = float(data.loc[valid_rows, 'signal'].mean())
+        
+        metrics = {
+            "version": version,
+            "status": "success",
+            "rows_processed": rows_processed,
+            "signal_rate": signal_rate,
+            "latency_ms": latency_ms
+        }
+        write_output(args.output, metrics)
+        
+    except Exception as e:
+        error_metrics = {
+            "version": version,
+            "status": "error",
+            "error_message": str(e)
+        }
+        write_output(args.output, error_metrics)
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
