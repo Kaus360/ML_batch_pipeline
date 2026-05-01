@@ -1,0 +1,7 @@
+2026-05-01 12:00:00,000 - batch_pipeline - INFO - job started
+2026-05-01 12:00:00,001 - batch_pipeline - INFO - loaded config: {'seed': 42, 'window': 5, 'version': 'v1'}
+2026-05-01 12:00:00,050 - batch_pipeline - INFO - loaded 10000 rows from data.csv
+2026-05-01 12:00:00,051 - batch_pipeline - INFO - computing rolling mean
+2026-05-01 12:00:00,055 - batch_pipeline - INFO - computing signals
+2026-05-01 12:00:00,125 - batch_pipeline - INFO - metrics summary: {'version': 'v1', 'status': 'success', 'rows_processed': 10000, 'signal_rate': 0.4925, 'latency_ms': 125.43}
+2026-05-01 12:00:00,126 - batch_pipeline - INFO - job completed successfully
